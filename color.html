@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PredictaX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg-color: #0f0f0f;
+      --text-color: #f5f5f5;
+      --accent-color: #a970ff;
+      --input-bg: #1b1b1b;
+      --btn-bg: #2d2d2d;
+      --btn-hover: #444;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding-top: 60px;
+      overflow-x: hidden;
+    }
+
+    .glow-title {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      opacity: 0.8;
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    @keyframes colorGlow {
+      0%   { color: #a970ff; text-shadow: 0 0 8px #a970ff; }
+      33%  { color: #00ff99; text-shadow: 0 0 8px #00ff99; }
+      66%  { color: #ff4f4f; text-shadow: 0 0 8px #ff4f4f; }
+      100% { color: #a970ff; text-shadow: 0 0 8px #a970ff; }
+    }
+
+    .text-glow {
+      animation: colorGlow 4s ease-in-out infinite;
+    }
+
+    input[type="text"] {
+      padding: 12px 20px;
+      width: 300px;
+      border: none;
+      background-color: var(--input-bg);
+      color: var(--accent-color);
+      font-size: 16px;
+      border-radius: 8px;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    button {
+      padding: 12px 25px;
+      background-color: var(--btn-bg);
+      color: var(--accent-color);
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: var(--btn-hover);
+    }
+
+    .result {
+      margin-top: 25px;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    .highlight {
+      font-weight: bold;
+      color: var(--accent-color);
+    }
+
+    .toggle-theme {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      color: var(--accent-color);
+      border: 2px solid var(--accent-color);
+      padding: 5px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .light-mode {
+      --bg-color: #f5f5f5;
+      --text-color: #1b1b1b;
+      --input-bg: #ffffff;
+      --btn-bg: #e0e0e0;
+      --btn-hover: #d4d4d4;
+      --accent-color: #6b00b3;
+    }
+
+    #historyBox {
+      margin-top: 40px;
+      width: 85%;
+      max-width: 480px;
+      background-color: var(--input-bg);
+      padding: 20px 25px;
+      border-radius: 14px;
+      border: 1px solid var(--accent-color);
+      box-shadow: 0 0 12px rgba(169, 112, 255, 0.15);
+    }
+
+    #historyBox h3 {
+      margin-bottom: 15px;
+      font-size: 20px;
+      color: var(--accent-color);
+    }
+
+    #historyList {
+      list-style: none;
+      padding-left: 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    #historyList li {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(169, 112, 255, 0.1);
+    }
+
+    #historyList li:last-child {
+      border-bottom: none;
+    }
+
+    .predicting {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: #000000cc;
+      text-align: center;
+      border-radius: 12px;
+      padding: 14px 24px;
+      position: fixed;
+      z-index: 999;
+      left: 50%;
+      bottom: 40px;
+      transform: translateX(-50%);
+      font-weight: bold;
+      font-size: 15px;
+      animation: colorGlow 2s linear infinite;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #toast.show {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* ✨ Starry Background */
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      z-index: -1;
+      background: transparent;
+      background-image:
+        radial-gradient(#fff 1px, transparent 1px),
+        radial-gradient(#fff 1px, transparent 1px);
+      background-size: 100px 100px;
+      background-position: 0 0, 50px 50px;
+      animation: twinkle 4s linear infinite;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    @keyframes twinkle {
+      0%   { opacity: 0.4; }
+      50%  { opacity: 0.7; }
+      100% { opacity: 0.4; }
+    }
+
+    /* ✨ Light Mode Sparkle Background */
+    .stars-light {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      z-index: -1;
+      background: transparent;
+      background-image:
+        radial-gradient(rgba(255, 215, 255, 0.4) 1px, transparent 1px),
+        radial-gradient(rgba(255, 255, 200, 0.4) 1px, transparent 1px);
+      background-size: 90px 90px;
+      background-position: 25px 25px, 60px 60px;
+      animation: sparkle 6s ease-in-out infinite;
+      pointer-events: none;
+      opacity: 0.5;
+      display: none;
+    }
+
+    @keyframes sparkle {
+      0%   { opacity: 0.3; }
+      50%  { opacity: 0.6; }
+      100% { opacity: 0.3; }
+    }
+
+    body.light-mode .stars {
+      display: none;
+    }
+
+    body.light-mode .stars-light {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stars"></div>
+  <div class="stars-light"></div>
+
+  <button class="toggle-theme" onclick="toggleTheme()">Toggle Theme</button>
+
+  <h1 class="glow-title text-glow">🔮 PredictaX</h1>
+  <p class="subtitle text-glow">Your Trusted Number Oracle</p>
+
+  <p>Enter last 5 numbers (comma separated):</p>
+  <input type="text" id="inputNumbers" placeholder="e.g. 7,0,4,5,8">
+  <br>
+  <button onclick="predictNext()">Predict</button>
+
+  <div class="result text-glow" id="output"></div>
+
+  <div id="historyBox">
+    <h3>📜 History of Rounds Played</h3>
+    <ul id="historyList"></ul>
+  </div>
+
+  <div id="toast">Auto History Rounds Cleared</div>
+
+  <script>
+    let roundCounter = 0;
+
+    function categorize(num) {
+      return num >= 0 && num <= 5 ? "Small" : "Big";
+    }
+
+    function showToast() {
+      const toast = document.getElementById("toast");
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2000);
+    }
+
+   function predictNext() {
+  const input = document.getElementById("inputNumbers").value;
+  const nums = input.split(',').map(n => parseInt(n.trim()));
+  const output = document.getElementById("output");
+
+  if (nums.length < 5 || nums.some(n => isNaN(n) || n < 0 || n > 10)) {
+    output.innerHTML = "❌ Please enter at least 5 numbers between 0 and 10.";
+    return;
+  }
+
+  output.innerHTML = `<div class="predicting text-glow">🔮 Predicting<span id="dots">.</span></div>`;
+  let dotCount = 1;
+  const dotsInterval = setInterval(() => {
+    dotCount = (dotCount % 3) + 1;
+    document.getElementById("dots").innerText = ".".repeat(dotCount);
+  }, 400);
+
+  setTimeout(() => {
+    clearInterval(dotsInterval);
+
+    // --- Categorization ---
+    const categories = nums.map(n => n <= 5 ? "Small" : "Big");
+
+    // --- Streak Detection ---
+    let current = categories[0], streakCount = 1, maxStreak = 1, maxType = current;
+    for (let i = 1; i < categories.length; i++) {
+      if (categories[i] === current) {
+        streakCount++;
+        if (streakCount > maxStreak) {
+          maxStreak = streakCount;
+          maxType = current;
+        }
+      } else {
+        current = categories[i];
+        streakCount = 1;
+      }
+    }
+
+    // --- Alternation Detection ---
+    let isAlternating = true;
+    for (let i = 2; i < categories.length; i++) {
+      if (categories[i] === categories[i - 2]) {
+        isAlternating = false;
+        break;
+      }
+    }
+
+    // --- Trend Detection ---
+    const bigCount = categories.filter(c => c === "Big").length;
+    const smallCount = categories.length - bigCount;
+    const trend = bigCount > smallCount ? "Big" : smallCount > bigCount ? "Small" : null;
+
+    // --- Weighted Logic Fallback ---
+    const weights = Array.from({ length: nums.length }, (_, i) => i + 1);
+    const weightedFreq = Array(11).fill(0);
+    nums.forEach((n, i) => {
+      weightedFreq[n] += weights[i];
+    });
+
+    const minFreq = Math.min(...weightedFreq.filter(f => f > 0));
+    const rareNums = weightedFreq.map((f, i) => f === minFreq ? i : -1).filter(n => n !== -1);
+    const unusedNums = weightedFreq.map((f, i) => f === 0 ? i : -1).filter(n => n !== -1);
+
+    let predictionPool = unusedNums.length ? unusedNums : rareNums;
+
+    // 🧠 Smart Decision Layer
+    let chosenCategory = null;
+
+    if (maxStreak >= 3) {
+      // Reverse long streak
+      chosenCategory = maxType === "Big" ? "Small" : "Big";
+    } else if (isAlternating) {
+      // Continue alternation
+      chosenCategory = categories[nums.length - 1] === "Big" ? "Small" : "Big";
+    } else if (trend) {
+      // Reverse dominant trend
+      chosenCategory = trend === "Big" ? "Small" : "Big";
+    }
+
+    if (chosenCategory) {
+      const filtered = predictionPool.filter(n => (n <= 5 ? "Small" : "Big") === chosenCategory);
+      if (filtered.length) predictionPool = filtered;
+    }
+
+    const predicted = predictionPool[Math.floor(Math.random() * predictionPool.length)];
+    const likelyType = predicted <= 5 ? "Small" : "Big";
+
+    output.innerHTML = `
+      Prediction: <span class="highlight">${likelyType}</span><br>
+      Predicted Next Number: <span class="highlight">${predicted} (${likelyType})</span>
+    `;
+
+    const historyList = document.getElementById("historyList");
+    const historyItem = `
+      <li>
+        ➤ Input: [${nums.join(', ')}] |
+        Prediction: <b>${likelyType}</b> |
+        Result: <b>${predicted} (${likelyType})</b>
+      </li>
+    `;
+    historyList.innerHTML = historyItem + historyList.innerHTML;
+
+    roundCounter++;
+    if (roundCounter >= 5) {
+      setTimeout(() => {
+        document.getElementById("historyList").innerHTML = "";
+        roundCounter = 0;
+        showToast();
+      }, 500);
+    }
+  }, 2000);
+}
+
+    function toggleTheme() {
+      document.body.classList.toggle("light-mode");
+    }
+  </script>
+
+</body>
+  </html>
