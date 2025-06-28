@@ -1,1 +1,1 @@
-👉 [Launch PredictaX App](https://spiderx9090.github.io/predictax/color.html)
+👉 [Launch Marcus Predictor v1 App](https://codewithsumann.github.io/Marcus-Predictor-V1/color.html)
